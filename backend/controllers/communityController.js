@@ -119,3 +119,61 @@ exports.leaveCommunity = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
+// PATCH /api/communities/:id  (moderator only)
+exports.updateCommunity = async (req, res) => {
+  try {
+    const { description, image } = req.body;
+
+    // Only these two fields can be edited (the name stays fixed)
+    if (description !== undefined) req.community.description = description;
+    if (image !== undefined) req.community.image = image;
+
+    await req.community.save();
+    res.json(req.community);
+  } catch (err) {
+    if (err.name === 'ValidationError') {
+      return res.status(400).json({ message: err.message });
+    }
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+// GET /api/communities?q=cat
+exports.searchCommunities = async (req, res) => {
+  try {
+    const q = (req.query.q || '').trim();
+    const filter = {};
+
+    if (q) {
+      // Escape special characters so the search text is treated as plain text
+      const safe = q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      filter.name = { $regex: safe, $options: 'i' }; // 'i' = ignore capitals
+    }
+
+    const communities = await Community
+      .find(filter)
+      .sort({ memberCount: -1 }) // biggest communities first
+      .limit(20);
+
+    res.json(communities);
+  } catch (err) {
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+// GET /api/communities/mine
+exports.getMyCommunities = async (req, res) => {
+  try {
+    const memberships = await Membership
+      .find({ userId: req.user.id })
+      .populate('communityId');
+
+    // Skip any membership whose community no longer exists
+    const communities = memberships
+      .map((m) => m.communityId)
+      .filter(Boolean);
+
+    res.json(communities);
+  } catch (err) {
+    res.status(500).json({ message: 'Server error' });
+  }
+};
