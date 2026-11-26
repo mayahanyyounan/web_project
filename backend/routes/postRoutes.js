@@ -1,7 +1,7 @@
 const express=require('express');
-const router=express.Router();
+const router=express.Router(); //router is a framework runs on node.js and handles requests and responses, making it easier to create API servers
 
-const Post=require('../models/Post');
+const Post=require('../models/Post'); //import model
 
 router.post('/', async(req,res)=>{
     try{
@@ -15,6 +15,8 @@ router.post('/', async(req,res)=>{
         res.status(500).json({message:error.message});
     }
 })
+
+//Get posts on feed
 router.get('/', async (req, res) => {
     try {
         // 1. Sorting
@@ -79,4 +81,31 @@ router.delete('/:id',async(req,res)=>{
         res.status(500).json({message:error.message});
     }
 });
+
+//Viewing posts inside a community
+router.get('/community/:communityId',async(req,res)=>{ //ghayart f route el url ashan tbaa gher elget eltania
+    try{
+        const communityId=req.params.communityId;
+        const posts=await Post.find({communityId:communityId}); // shelt el if ashan find() returns array so returns [] if empty
+        res.status(200).json(posts);
+    }catch(error){
+        res.status(500).json({message:error.message});
+    }
+});
+
+//Open one POST
+router.get('/:id',async(req,res)=>{
+   try{
+        const postId=req.params.id;
+        const getPost=await Post.findById(postId);
+        if(!getPost){
+            return res.status(404).json({message:'Post not found '});
+        }
+        res.status(200).json(getPost);
+   } catch(error){
+    res.status(500).json({message:error.message});
+   }
+});
+
+
 module.exports = router;
