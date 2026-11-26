@@ -8,6 +8,6 @@ const membershipSchema = new mongoose.Schema({
 // A user can join a community only once
 membershipSchema.index({ userId: 1, communityId: 1 }, { unique: true });
 // Fast lookup of a community's members
-membershipSchema.index({ communityId: 1 });
+//membershipSchema.index({ communityId: 1 });
 
 module.exports = mongoose.model('Membership', membershipSchema);

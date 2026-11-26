@@ -8,7 +8,6 @@ const communitySchema = new mongoose.Schema({
   image: { type: String, default: '' }
 }, { timestamps: { createdAt: true, updatedAt: false } });
 
-// Unique name, case-insensitive ("Cats" and "cats" count as the same)
 communitySchema.index(
   { name: 1 },
   { unique: true, collation: { locale: 'en', strength: 2 } }
