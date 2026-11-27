@@ -13,7 +13,7 @@ exports.createCommunity = async (req, res) => {
      // 3. make the creator join it automatically (create a Membership)
     await Membership.create({userId: req.user.id,communityId: community._id});
 
-    res.status(201).json(community); //created ba3ato lel frontend
+    res.status(201).json(community); 
   } 
   catch (err) {
     if (err.code === 11000) {
@@ -152,7 +152,6 @@ exports.getMyCommunities = async (req, res) => {
       .find({ userId: req.user.id })
       .populate('communityId');
 
-    // Skip any membership whose community no longer exists
     const communities = memberships
       .map((m) => m.communityId)
       .filter(Boolean);
@@ -166,14 +165,9 @@ exports.getMyCommunities = async (req, res) => {
 // DELETE /api/communities/:id/posts/:postId  (moderator only)
 exports.removePost = async (req, res) => {
   try {
-    const post = await Post.findOneAndDelete({
-      _id: req.params.postId,
-      communityId: req.params.id
-    });
+    const post = await Post.findOneAndDelete({_id: req.params.postId,communityId: req.params.id});
 
-    if (!post) {
-      return res.status(404).json({ message: 'Post not found in this community' });
-    }
+    if (!post) {return res.status(404).json({ message: 'Post not found in this community' });}
 
     res.json({ message: 'Post removed' });
   } 
@@ -186,17 +180,13 @@ exports.removePost = async (req, res) => {
 exports.removeComment = async (req, res) => {
   try {
     const comment = await Comment.findById(req.params.commentId);
-    if (!comment) {
-      return res.status(404).json({ message: 'Comment not found' });
-    }
+    if (!comment) {return res.status(404).json({ message: 'Comment not found' });}
 
     // A comment has no communityId, so check through its post
     const post = await Post.findOne({ _id: comment.postId, communityId: req.params.id });
-    if (!post) {
-      return res.status(404).json({ message: 'Comment not found in this community' });
-    }
+    if (!post) {return res.status(404).json({ message: 'Comment not found in this community' });}
 
-    // Collect the comment and all its replies (replies of replies too)
+    // Collect the comment and all its replies (replies of replies)
     let ids = [comment._id];
     let frontier = [comment._id];
     while (frontier.length) {
