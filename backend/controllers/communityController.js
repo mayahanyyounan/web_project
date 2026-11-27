@@ -1,7 +1,7 @@
 const Community = require('../models/Community');
 const Membership = require('../models/Membership');
 const Post = require('../models/Post');
-const Comment = require('../models/Comment');
+//const Comment = require('../models/Comment');
 
 // POST /api/communities
 exports.createCommunity = async (req, res) => {
@@ -177,30 +177,30 @@ exports.removePost = async (req, res) => {
 };
 
 // DELETE /api/communities/:id/comments/:commentId  (moderator only)
-exports.removeComment = async (req, res) => {
-  try {
-    const comment = await Comment.findById(req.params.commentId);
-    if (!comment) {return res.status(404).json({ message: 'Comment not found' });}
+// exports.removeComment = async (req, res) => {
+//   try {
+//     const comment = await Comment.findById(req.params.commentId);
+//     if (!comment) {return res.status(404).json({ message: 'Comment not found' });}
 
-    // A comment has no communityId, so check through its post
-    const post = await Post.findOne({ _id: comment.postId, communityId: req.params.id });
-    if (!post) {return res.status(404).json({ message: 'Comment not found in this community' });}
+//     // A comment has no communityId, so check through its post
+//     const post = await Post.findOne({ _id: comment.postId, communityId: req.params.id });
+//     if (!post) {return res.status(404).json({ message: 'Comment not found in this community' });}
 
-    // Collect the comment and all its replies (replies of replies)
-    let ids = [comment._id];
-    let frontier = [comment._id];
-    while (frontier.length) {
-      const children = await Comment.find({ parentCommentId: { $in: frontier } }).select('_id');
-      frontier = children.map((c) => c._id);
-      ids = ids.concat(frontier);
-    }
+//     // Collect the comment and all its replies (replies of replies)
+//     let ids = [comment._id];
+//     let frontier = [comment._id];
+//     while (frontier.length) {
+//       const children = await Comment.find({ parentCommentId: { $in: frontier } }).select('_id');
+//       frontier = children.map((c) => c._id);
+//       ids = ids.concat(frontier);
+//     }
 
-    const result = await Comment.deleteMany({ _id: { $in: ids } });
-    await Post.findByIdAndUpdate(post._id, { $inc: { commentCount: -result.deletedCount } });
+//     const result = await Comment.deleteMany({ _id: { $in: ids } });
+//     await Post.findByIdAndUpdate(post._id, { $inc: { commentCount: -result.deletedCount } });
 
-    res.json({ message: 'Comment removed', removed: result.deletedCount });
-  } 
-  catch (err) {
-    res.status(500).json({ message: 'Server error' });
-  }
-};
+//     res.json({ message: 'Comment removed', removed: result.deletedCount });
+//   } 
+//   catch (err) {
+//     res.status(500).json({ message: 'Server error' });
+//   }
+// };
