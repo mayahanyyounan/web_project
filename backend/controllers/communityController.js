@@ -14,7 +14,8 @@ exports.createCommunity = async (req, res) => {
     await Membership.create({userId: req.user.id,communityId: community._id});
 
     res.status(201).json(community); //created ba3ato lel frontend
-  } catch (err) {
+  } 
+  catch (err) {
     if (err.code === 11000) {
       return res.status(409).json({ message: 'Community name already taken' });
     }
@@ -49,7 +50,8 @@ exports.joinCommunity = async (req, res) => {
 
     try {
       await Membership.create({userId: req.user.id,communityId: community._id});
-    } catch (err) {
+    } 
+    catch (err) {
       if (err.code === 11000) {
         // Already a member: succeed without changing the count
         return res.json({ joined: true, memberCount: community.memberCount });
@@ -65,7 +67,8 @@ exports.joinCommunity = async (req, res) => {
     );
 
     res.status(201).json({ joined: true, memberCount: updated.memberCount });
-  } catch (err) {
+  }
+   catch (err) {
     res.status(500).json({ message: 'Server error' });
   }
 };
@@ -94,7 +97,8 @@ exports.leaveCommunity = async (req, res) => {
     }
 
     res.json({ joined: false, memberCount: community.memberCount });
-  } catch (err) {
+  } 
+  catch (err) {
     res.status(500).json({ message: 'Server error' });
   }
 };
@@ -109,7 +113,8 @@ exports.updateCommunity = async (req, res) => {
 
     await req.community.save();
     res.json(req.community);
-  } catch (err) {
+  }
+   catch (err) {
     if (err.name === 'ValidationError') {
       return res.status(400).json({ message: err.message });
     }
@@ -134,7 +139,8 @@ exports.searchCommunities = async (req, res) => {
       .limit(20);
 
     res.json(communities);
-  } catch (err) {
+  } 
+  catch (err) {
     res.status(500).json({ message: 'Server error' });
   }
 };
@@ -152,7 +158,8 @@ exports.getMyCommunities = async (req, res) => {
       .filter(Boolean);
 
     res.json(communities);
-  } catch (err) {
+  } 
+  catch (err) {
     res.status(500).json({ message: 'Server error' });
   }
 };
@@ -169,7 +176,8 @@ exports.removePost = async (req, res) => {
     }
 
     res.json({ message: 'Post removed' });
-  } catch (err) {
+  } 
+  catch (err) {
     res.status(500).json({ message: 'Server error' });
   }
 };
@@ -201,7 +209,8 @@ exports.removeComment = async (req, res) => {
     await Post.findByIdAndUpdate(post._id, { $inc: { commentCount: -result.deletedCount } });
 
     res.json({ message: 'Comment removed', removed: result.deletedCount });
-  } catch (err) {
+  } 
+  catch (err) {
     res.status(500).json({ message: 'Server error' });
   }
 };
