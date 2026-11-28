@@ -1,4 +1,3 @@
-
 require('dotenv').config();
 
 const express = require('express');
@@ -6,6 +5,7 @@ const cors = require('cors');
 const connectDB = require('./config/db');
 const postRoutes = require('./routes/postRoutes');
 const voteRoutes = require('./routes/voteRoutes');
+const communityRoutes = require('./routes/communityRoutes');
 const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
 
@@ -16,6 +16,7 @@ app.use(express.json());
 
 app.use('/api/posts', postRoutes);
 app.use('/api/posts', voteRoutes);
+app.use('/api/communities', communityRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 
